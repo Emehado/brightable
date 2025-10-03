@@ -1,19 +1,20 @@
 import { inngest } from "./client";
+import { createAgent, grok, openai } from "@inngest/agent-kit";
 
 export const helloWorld = inngest.createFunction(
   { id: "hello-world" },
   { event: "test/hello.world" },
   async ({ event, step }) => {
-    await step.sleep("upload all documents", "10s");
-    await step.sleep("Translate documents to user language", "25s");
-    await step.sleep("Extract Product information", "10s");
-    await step.sleep("Extract BOM information", "10s");
-    await step.sleep("Extract size specs", "10s");
-    await step.sleep("Extract product images", "20s");
-    await step.sleep(
-      "Group extracted images into Tech Diagram & Style Sketch",
-      "5s"
-    );
-    return { message: `Hello ${event.data.email}!` };
+    await step.sleep("analyzing request", "2s");
+
+    const summarizer = createAgent({
+      name: "summarizer",
+      system:
+        "You are a senior Nextjs developer, who writes elegant, simple and well maintainable code. You have expertise in ReactJs and its ecosystem and have a good eye for design and user experience.",
+      model: grok({ model: "grok-code-fast-1" }),
+    });
+
+    const { output } = await summarizer.run(`${event.data.value}`);
+    return { output };
   }
 );
