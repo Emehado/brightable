@@ -1,10 +1,13 @@
 "use client";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useTRPC } from "@/trpc/client";
 import { useMutation } from "@tanstack/react-query";
+import { useState } from "react";
 import { toast } from "sonner";
 
 export default function Home() {
+  const [value, setValue] = useState("");
   const trpc = useTRPC();
 
   const invokeMutation = useMutation(
@@ -17,9 +20,15 @@ export default function Home() {
 
   return (
     <div className="mx-auto container py-24">
+      <Input
+        className="mb-4"
+        placeholder="write something..."
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+      />
       <Button
         disabled={invokeMutation.isPending}
-        onClick={() => invokeMutation.mutate({ text: "Bright" })}
+        onClick={() => invokeMutation.mutate({ value })}
       >
         Invoke Background job
       </Button>
